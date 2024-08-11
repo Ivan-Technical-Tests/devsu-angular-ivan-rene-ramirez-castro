@@ -126,3 +126,57 @@ input[type="date"] {
         margin-bottom: 0;
     }
 }
+
+
+/* Skeleton Loader */
+.skeleton-form-container {
+    max-width: 600px;
+    margin: 20px auto 0;
+    padding: 40px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.skeleton-header {
+    width: 50%;
+    height: 24px;
+    background-color: #e0e0e0;
+    margin: 0 auto 20px;
+}
+
+hr {
+    margin-bottom: 30px;
+}
+
+.skeleton-form-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.skeleton-form-group {
+    flex: 1;
+    height: 40px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+}
+
+.skeleton-buttons {
+    width: 48%;
+    height: 48px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    margin-top: 30px;
+}
+
+@media (max-width: 600px) {
+    .skeleton-form-row {
+        flex-direction: column;
+    }
+
+    .skeleton-buttons {
+        width: 100%;
+    }
+}

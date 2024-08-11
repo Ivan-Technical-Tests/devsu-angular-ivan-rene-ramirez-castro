@@ -15,6 +15,7 @@ export class AddProductComponent implements OnInit {
   idExistsError: boolean = false;
   isEditMode: boolean = false;
   productId: string | null = null;
+  loading: boolean = true;
 
   constructor(
     private fb: FormBuilder,
@@ -22,15 +23,15 @@ export class AddProductComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    const today = new Date().toISOString().split('T')[0]; // Obtiene la fecha actual en formato 'yyyy-MM-dd'
+    const today = new Date().toISOString().split('T')[0];
 
     this.productForm = this.fb.group({
       id: [{ value: '', disabled: this.isEditMode }, [Validators.required, Validators.minLength(3)]],
       name: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(100)]],
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(200)]],
-      logo: ['', [Validators.required]], // TODO: Validar que sea una URL válida
-      releaseDate: [today, [Validators.required, this.validateDates.bind(this)]], // Fecha de liberación inicializada a hoy
-      reviewDate: [today, [Validators.required, this.validateDates.bind(this)]]  // Fecha de revisión inicializada a hoy
+      logo: ['', [Validators.required]],
+      releaseDate: [today, [Validators.required, this.validateDates.bind(this)]],
+      reviewDate: [today, [Validators.required, this.validateDates.bind(this)]]
     });
   }
 
@@ -39,26 +40,33 @@ export class AddProductComponent implements OnInit {
       this.productId = params.get('id');
       if (this.productId) {
         this.isEditMode = true;
+        this.loading = true;
         this.loadProduct(this.productId);
+      } else {
+        this.loading = false;
       }
     });
   }
 
   loadProduct(id: string): void {
-    this.productUsecase.getProduct(id).subscribe((product: Product) => {
-      // TODO: Actualizar el formulario con los datos del producto
+    this.loading = true;
 
-      this.productForm.patchValue({
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        logo: product.logo,
-        releaseDate: new Date(product.date_release).toISOString().split('T')[0],
-        reviewDate: new Date(product.date_revision).toISOString().split('T')[0]
+    // TODO: Quitar el delay y mostrar el skeleton de forma instantánea
+    setTimeout(() => {
+      this.productUsecase.getProduct(id).subscribe((product: Product) => {
+        this.productForm.patchValue({
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          logo: product.logo,
+          releaseDate: new Date(product.date_release).toISOString().split('T')[0],
+          reviewDate: new Date(product.date_revision).toISOString().split('T')[0]
+        });
+
+        this.productForm.get('id')?.disable();
+        this.loading = false;
       });
-
-      this.productForm.get('id')?.disable();  // Deshabilitar el campo ID en modo edición
-    });
+    }, 500);
   }
 
   onSubmit(): void {

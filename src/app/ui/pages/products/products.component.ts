@@ -34,7 +34,8 @@ export class ProductsComponent implements OnInit {
 
   loadProducts() {
     this.loading = true;
-    // esperar 1 segundo para mostrar el spinner
+
+    // TODO: Quitar el delay y mostrar el spinner de forma instantánea
     setTimeout(() => {
       this.productUsecase.getProducts().subscribe({
         next: response => {
@@ -47,7 +48,7 @@ export class ProductsComponent implements OnInit {
           console.log(error);
         }
       });
-    }, 1000);
+    }, 500);
   }
 
   filterProducts() {
