@@ -164,7 +164,7 @@ export class FormProductComponent implements OnInit {
       this.productForm.get('releaseDate')?.setErrors({ invalidReleaseDate: true });
     } else {
       this.productForm.get('releaseDate')?.setErrors(null);
-      const reviewDate = this.calculateReviewDate(releaseDate.toISOString().split('T')[0]);
+      const reviewDate = this.calculateReviewDate(today.toISOString().split('T')[0]);
       this.productForm.get('reviewDate')?.setValue(reviewDate);
     }
   }

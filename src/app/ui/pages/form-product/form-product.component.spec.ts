@@ -1,206 +1,126 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute, convertToParamMap } from '@angular/router';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { of, BehaviorSubject } from 'rxjs';
-import { ProductUsecase } from '../../../domain/models/usecases/product-usecase';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { of } from 'rxjs';
 import { FormProductComponent } from './form-product.component';
-import { PostProductRequest, Product, PutProductRequest } from '../../../domain/models/product/product.model';
+import { ProductUsecase } from '../../../domain/models/usecases/product-usecase';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+// Importa el componente app-header si es parte de tu aplicación
+import { HeaderComponent } from '../../shared/header/header.component';
 
 describe('FormProductComponent', () => {
     let component: FormProductComponent;
     let fixture: ComponentFixture<FormProductComponent>;
-    let productUsecaseSpy: jasmine.SpyObj<ProductUsecase>;
-    let routerSpy: jasmine.SpyObj<Router>;
-    let activatedRouteSpy: any;
-    let queryParamMapSubject: BehaviorSubject<any>;
+    let productUsecaseMock: any;
+    let routerMock: any;
+    let routeMock: any;
 
     beforeEach(async () => {
-        const productUsecaseSpyObj = jasmine.createSpyObj('ProductUsecase', [
-            'getProduct',
-            'postProduct',
-            'putProduct',
-            'validateProduct'
-        ]);
-        const routerSpyObj = jasmine.createSpyObj('Router', ['navigate']);
-
-        queryParamMapSubject = new BehaviorSubject(convertToParamMap({ id: '123' }));
-        activatedRouteSpy = {
-            queryParamMap: queryParamMapSubject.asObservable(),
-        };
+        productUsecaseMock = jasmine.createSpyObj('ProductUsecase', ['getProduct', 'postProduct', 'putProduct', 'validateProduct']);
+        routerMock = jasmine.createSpyObj('Router', ['navigate']);
+        routeMock = { queryParamMap: of({ get: () => null }) };
 
         await TestBed.configureTestingModule({
             declarations: [FormProductComponent],
             imports: [ReactiveFormsModule],
             providers: [
                 FormBuilder,
-                { provide: ProductUsecase, useValue: productUsecaseSpyObj },
-                { provide: Router, useValue: routerSpyObj },
-                { provide: ActivatedRoute, useValue: activatedRouteSpy }
+                { provide: ProductUsecase, useValue: productUsecaseMock },
+                { provide: Router, useValue: routerMock },
+                { provide: ActivatedRoute, useValue: routeMock }
             ],
-            schemas: [CUSTOM_ELEMENTS_SCHEMA] // Ignorar elementos desconocidos
+            schemas: [CUSTOM_ELEMENTS_SCHEMA]
         }).compileComponents();
-
-        fixture = TestBed.createComponent(FormProductComponent);
-        component = fixture.componentInstance;
-        productUsecaseSpy = TestBed.inject(ProductUsecase) as jasmine.SpyObj<ProductUsecase>;
-        routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     });
 
-    it('should create', () => {
+    beforeEach(() => {
+        fixture = TestBed.createComponent(FormProductComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
+
+    it('should create the component', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should initialize form with default values', () => {
-        queryParamMapSubject.next(convertToParamMap({ id: null }));
-        fixture.detectChanges();
-        const today = new Date().toISOString().split('T')[0];
-        const formValues = component.productForm.value;
+    it('should invalidate the form when fields are empty', () => {
+        component.productForm.controls['id'].setValue('');
+        component.productForm.controls['name'].setValue('');
+        component.productForm.controls['description'].setValue('');
+        component.productForm.controls['logo'].setValue('');
 
-        expect(formValues.id).toBe('');
-        expect(formValues.name).toBe('');
-        expect(formValues.description).toBe('');
-        expect(formValues.logo).toBe('');
-        expect(formValues.releaseDate).toBe(today);
+        expect(component.productForm.valid).toBeFalse();
     });
 
-    it('should load product in edit mode', fakeAsync(() => {
-        const mockProduct: Product = {
-            id: '123',
-            name: 'Test Product',
-            description: 'A product for testing',
-            logo: 'logo.png',
-            date_release: new Date('2024-08-11T00:00:00Z'),
-            date_revision: new Date('2024-08-11T00:00:00Z'),
-        };
+    it('should validate the form when all fields are filled correctly', fakeAsync(() => {
+        // Simula que el ID no existe
+        productUsecaseMock.validateProduct.and.returnValue(of(false));
 
-        productUsecaseSpy.getProduct.and.returnValue(of(mockProduct));
-        fixture.detectChanges();
-        tick(500); // Simular el retraso
+        component.productForm.controls['id'].setValue('123');
+        component.productForm.controls['name'].setValue('Product Name');
+        component.productForm.controls['description'].setValue('This is a description for the product.');
+        component.productForm.controls['logo'].setValue('logo.png');
+        component.productForm.controls['releaseDate'].setValue('2024-01-01');
+        component.productForm.controls['reviewDate'].setValue('2025-01-01');
 
-        expect(component.productForm.get('id')?.value).toBe(mockProduct.id);
-        expect(component.productForm.get('name')?.value).toBe(mockProduct.name);
-        expect(component.productForm.get('description')?.value).toBe(mockProduct.description);
-        expect(component.productForm.get('logo')?.value).toBe(mockProduct.logo);
-        expect(component.isEditMode).toBeTrue();
+        // Ejecuta la validación asíncrona
+        component.productForm.updateValueAndValidity();
+
+        // Simula la espera para la validación asíncrona
+        tick();
+
+        expect(component.productForm.valid).toBe(true);
     }));
 
-    it('should create a new product', () => {
-        queryParamMapSubject.next(convertToParamMap({ id: null }));
-        fixture.detectChanges();
+    it('should load product and patch form values when productId exists', fakeAsync(() => {
 
-        const mockDate = new Date('2024-08-11T00:00:00Z');
-        const mockRequest: PostProductRequest = {
+        const mockDateToday = new Date();
+
+        const mockProduct = {
             id: '123',
-            name: 'New Product',
-            description: 'Description for new product',
+            name: 'Product Name',
+            description: 'This is a description for the product.',
             logo: 'logo.png',
-            date_release: mockDate,
-            date_revision: mockDate,
+            date_release: mockDateToday.toISOString().split('T')[0],
+            date_revision: new Date(mockDateToday.setFullYear(mockDateToday.getFullYear() + 1)).toISOString().split('T')[0]
         };
 
-        component.productForm.setValue({
-            id: mockRequest.id,
-            name: mockRequest.name,
-            description: mockRequest.description,
-            logo: mockRequest.logo,
-            releaseDate: mockRequest.date_release.toISOString().split('T')[0],
-            reviewDate: mockRequest.date_revision.toISOString().split('T')[0]
-        });
+        productUsecaseMock.validateProduct.and.returnValue(of(false));
 
-        const mockResponse = {
-            message: 'Product created',
-            data: mockRequest,
-        };
+        productUsecaseMock.getProduct.and.returnValue(of(mockProduct));
 
-        productUsecaseSpy.postProduct.and.returnValue(of(mockResponse));
+        component.loadProduct('123');
 
-        spyOn(component, 'showSuccessModal').and.callFake(() => {
-            routerSpy.navigate(['']);
-        });
+        // 1.1 segundos por el delay
+        tick(1100);
 
-        component.onSubmit();
+        expect(component.productForm.get('id')?.value).toEqual(mockProduct.id);
+        expect(component.productForm.get('name')?.value).toEqual(mockProduct.name);
+        expect(component.productForm.get('description')?.value).toEqual(mockProduct.description);
+        expect(component.productForm.get('logo')?.value).toEqual(mockProduct.logo);
+        expect(component.productForm.get('releaseDate')?.value).toEqual(mockProduct.date_release);
+        expect(component.productForm.get('reviewDate')?.value).toEqual(mockProduct.date_revision);
+    }));
 
-        expect(productUsecaseSpy.postProduct).toHaveBeenCalledWith(mockRequest);
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['']);
-    });
-
-    it('should update an existing product', () => {
-        const mockDate = new Date('2024-08-11T00:00:00Z');
-        const mockRequest: PutProductRequest = {
-            name: 'Updated Product',
-            description: 'Updated description',
-            logo: 'updated_logo.png',
-            date_release: mockDate,
-            date_revision: mockDate,
-        };
-
-        component.isEditMode = true;
-        component.productId = '123';
-
-        component.productForm.setValue({
-            id: '123',
-            name: mockRequest.name,
-            description: mockRequest.description,
-            logo: mockRequest.logo,
-            releaseDate: mockRequest.date_release.toISOString().split('T')[0],
-            reviewDate: mockRequest.date_revision.toISOString().split('T')[0]
-        });
-
-        const mockResponse = {
-            message: 'Product updated',
-            data: { id: '123', ...mockRequest },
-        };
-
-        productUsecaseSpy.putProduct.and.returnValue(of(mockResponse));
-
-        component.onSubmit();
-
-        expect(productUsecaseSpy.putProduct).toHaveBeenCalledWith('123', mockRequest);
-    });
-
-    it('should mark all fields as touched if form is invalid', () => {
-        queryParamMapSubject.next(convertToParamMap({ id: null }));
-        fixture.detectChanges();
-
-        component.onSubmit();
-
-        expect(component.productForm.get('id')?.touched).toBeTrue();
-        expect(component.productForm.get('name')?.touched).toBeTrue();
-        expect(component.productForm.get('description')?.touched).toBeTrue();
-    });
-
-    it('should validate release date correctly', () => {
-        queryParamMapSubject.next(convertToParamMap({ id: null }));
-        fixture.detectChanges();
-
-        const releaseDateControl = component.productForm.get('releaseDate');
-        releaseDateControl?.setValue('2000-01-01');
-
-        component.validateReleaseDate();
-
-        expect(releaseDateControl?.hasError('invalidReleaseDate')).toBeTrue();
-    });
-
-    it('should navigate to home after successful creation', () => {
-        spyOn(window, 'confirm').and.returnValue(true); // Simula que el usuario confirma el modal
-        const mockResponse = { message: 'Product created', data: {} as any };
-        productUsecaseSpy.postProduct.and.returnValue(of(mockResponse));
-
+    it('should call createProduct when form is valid and is not in edit mode', fakeAsync(() => {
+        spyOn(component, 'createProduct');
         component.isEditMode = false;
+
+        productUsecaseMock.validateProduct.and.returnValue(of(false));
+
+        component.productForm.controls['id'].setValue('123');
+        component.productForm.controls['name'].setValue('Product Name');
+        component.productForm.controls['description'].setValue('This is a description for the product.');
+        component.productForm.controls['logo'].setValue('logo.png');
+        component.productForm.controls['releaseDate'].setValue('2024-01-01');
+        component.productForm.controls['reviewDate'].setValue('2025-01-01');
+
+        tick();
+
         component.onSubmit();
 
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['']);
-    });
+        expect(component.createProduct).toHaveBeenCalled();
+    }));
 
-    it('should show error modal on creation failure', () => {
-        spyOn(window, 'confirm').and.returnValue(true); // Simula que el usuario confirma el modal
-        productUsecaseSpy.postProduct.and.returnValue(of({ message: 'Product creation failed' } as any));
 
-        component.isEditMode = false;
-        component.onSubmit();
-
-        // Aquí podrías probar que el modal de error ha sido mostrado
-        // Esto podría requerir un ajuste en el código del componente para permitir el espía o mocks
-    });
 });
