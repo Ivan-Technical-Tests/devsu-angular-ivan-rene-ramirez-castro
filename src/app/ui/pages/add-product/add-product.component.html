@@ -1,7 +1,7 @@
 <app-header></app-header>
 
 <div class="product-form-container">
-    <h2>Formulario de Registro</h2>
+    <h2>{{ isEditMode ? 'Formulario de Edición' : 'Formulario de Registro' }}</h2>
     <hr />
     <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
         <div class="form-row">
@@ -39,11 +39,9 @@
                     [ngClass]="{'invalid': isFieldInvalid('description')}" placeholder="Ingrese la descripción" />
                 <div *ngIf="isFieldInvalid('description')" class="error-message">
                     <span *ngIf="productForm.get('description')?.hasError('minlength')">La descripción debe tener al
-                        menos 10
-                        caracteres.</span>
+                        menos 10 caracteres.</span>
                     <span *ngIf="productForm.get('description')?.hasError('maxlength')">La descripción no puede exceder
-                        los 200
-                        caracteres.</span>
+                        los 200 caracteres.</span>
                     <span *ngIf="productForm.get('description')?.hasError('required')">Este campo es requerido!</span>
                 </div>
             </div>
@@ -52,7 +50,6 @@
                 <input id="logo" formControlName="logo" type="text" [ngClass]="{'invalid': isFieldInvalid('logo')}"
                     placeholder="Ingrese la URL del logo" />
                 <div *ngIf="isFieldInvalid('logo')" class="error-message">
-                    <span *ngIf="productForm.get('logo')?.hasError('pattern')">La URL no es válida.</span>
                     <span *ngIf="productForm.get('logo')?.hasError('required')">Este campo es requerido!</span>
                 </div>
             </div>
@@ -82,7 +79,7 @@
 
         <div class="form-buttons">
             <button type="button" class="reset-button" (click)="onReset()">Reiniciar</button>
-            <button type="submit" class="submit-button">Enviar</button>
+            <button type="submit" class="submit-button">{{ isEditMode ? 'Actualizar' : 'Enviar' }}</button>
         </div>
     </form>
 </div>

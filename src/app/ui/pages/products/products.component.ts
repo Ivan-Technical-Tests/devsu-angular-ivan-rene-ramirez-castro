@@ -154,7 +154,6 @@ export class ProductsComponent implements OnInit {
   }
 
   onEdit(productId: string) {
-    alert(`Editar producto con ID: ${productId}`);
-    // Aquí iría la lógica para editar el producto
+    this.router.navigate(['edit'], { queryParams: { id: productId } });
   }
 }

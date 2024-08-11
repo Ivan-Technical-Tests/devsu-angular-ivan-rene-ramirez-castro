@@ -75,8 +75,8 @@
                         <div class="dropdown">
                             <button class="dropdown-button" (click)="toggleDropdown(product.id, $event)">⋮</button>
                             <div id="dropdown-{{ product.id }}" class="dropdown-content">
-                                <a href="#" (click)="onEdit(product.id)">Editar</a>
-                                <a href="#" (click)="openDeleteModal(product)">Eliminar</a>
+                                <p (click)="onEdit(product.id)">Editar</p>
+                                <p (click)="openDeleteModal(product)">Eliminar</p>
                             </div>
                         </div>
                     </td>
