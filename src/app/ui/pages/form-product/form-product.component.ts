@@ -209,18 +209,14 @@ export class FormProductComponent implements OnInit {
 
   showErrorModal(): void {
     const message = this.isEditMode ? 'Ocurrió un error al actualizar el producto.' : 'Ocurrió un error al guardar el producto.';
-    if (confirm(message)) {
-      // Si el usuario cierra el modal o da clic en aceptar, no se realiza ninguna acción
-    }
+    alert(message);
+
   }
 
   showErrorModalGet(): void {
     const message = this.isEditMode ? 'El producto no existe.' : 'No se pudo cargar el producto.';
-    if (confirm(message)) {
-      // Si el usuario cierra el modal o da clic en aceptar, no se realiza ninguna acción
-    }
+    alert(message);
     this.router.navigate(['']);
   }
-
 
 }
