@@ -29,4 +29,8 @@ export class ProductUsecase {
     deleteProduct(id: string): Observable<DeleteProductResponse> {
         return this.productGateway.deleteProduct(id);
     }
+
+    validateProduct(id: string): Observable<boolean> {
+        return this.productGateway.validateProduct(id);
+    }
 }

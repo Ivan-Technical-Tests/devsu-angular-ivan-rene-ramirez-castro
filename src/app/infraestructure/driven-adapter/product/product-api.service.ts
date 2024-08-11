@@ -34,4 +34,8 @@ export class ProductApiService extends ProductGateway {
     deleteProduct(id: string): Observable<DeleteProductResponse> {
         return this.http.delete<DeleteProductResponse>(`${this._url}/${id}`);
     }
+
+    validateProduct(id: string): Observable<boolean> {
+        return this.http.get<boolean>(`${this._url}/verification/${id}`);
+    }
 }

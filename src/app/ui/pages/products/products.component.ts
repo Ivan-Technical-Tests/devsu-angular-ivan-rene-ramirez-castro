@@ -1,6 +1,7 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { ProductUsecase } from '../../../domain/models/usecases/product-usecase';
 import { Product } from '../../../domain/models/product/product.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-products',
@@ -9,7 +10,10 @@ import { Product } from '../../../domain/models/product/product.model';
 })
 export class ProductsComponent implements OnInit {
 
-  constructor(private productUsecase: ProductUsecase) { }
+  constructor(
+    private productUsecase: ProductUsecase,
+    private router: Router
+  ) { }
 
   products: Product[] = [];
   filteredProducts: Product[] = [];
@@ -60,7 +64,7 @@ export class ProductsComponent implements OnInit {
   }
 
   onAdd() {
-    alert('Agregar nuevo producto');
+    this.router.navigate(['/add']);
   }
 
   onItemsPerPageChange(event: Event) {

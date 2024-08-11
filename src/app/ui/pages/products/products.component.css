@@ -227,7 +227,6 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    /* Asegura que el modal esté por encima de todo */
 }
 
 .modal {
@@ -237,12 +236,26 @@
     max-width: 400px;
     width: 100%;
     text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal p {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.modal br {
+    display: block;
+    margin: 10px 0;
 }
 
 .modal-actions {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     margin-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 15px;
 }
 
 .cancel-button,
@@ -252,14 +265,26 @@
     border-radius: 4px;
     font-family: 'Roboto', sans-serif;
     cursor: pointer;
+    font-weight: bold;
+    width: 45%;
 }
 
 .cancel-button {
     background-color: #f1f1f1;
     color: #333;
+    transition: background-color 0.3s ease;
+}
+
+.cancel-button:hover {
+    background-color: #e0e0e0;
 }
 
 .confirm-button {
     background-color: #ffc107;
     color: white;
+    transition: background-color 0.3s ease;
+}
+
+.confirm-button:hover {
+    background-color: #e6a600;
 }

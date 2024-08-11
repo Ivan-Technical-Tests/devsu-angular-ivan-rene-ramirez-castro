@@ -11,6 +11,7 @@ import {
     PutProductResponse,
     // DELETE
     DeleteProductResponse,
+
 } from '../product.model';
 
 export abstract class ProductGateway {
@@ -27,5 +28,8 @@ export abstract class ProductGateway {
 
     // DELETE
     abstract deleteProduct(id: string): Observable<DeleteProductResponse>;
+
+    // VALIDATION
+    abstract validateProduct(id: string): Observable<boolean>;
 
 }
