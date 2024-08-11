@@ -36,9 +36,7 @@
                             Fecha en la que el producto fue reestructurado.
                         </div>
                     </th>
-                    <th>
-                        <!-- Columna de acciones sin título -->
-                    </th>
+                    <th></th> <!-- Columna de acciones sin título -->
                 </tr>
             </thead>
             <tbody>
@@ -78,7 +76,7 @@
                             <button class="dropdown-button" (click)="toggleDropdown(product.id, $event)">⋮</button>
                             <div id="dropdown-{{ product.id }}" class="dropdown-content">
                                 <a href="#" (click)="onEdit(product.id)">Editar</a>
-                                <a href="#" (click)="onDelete(product.id)">Eliminar</a>
+                                <a href="#" (click)="openDeleteModal(product)">Eliminar</a>
                             </div>
                         </div>
                     </td>
@@ -101,4 +99,15 @@
     @if (filteredProducts.length === 0 && !loading) {
     <p>No hay productos disponibles.</p>
     }
+
+    <!-- Modal de confirmación -->
+    <div *ngIf="showDeleteModal" class="modal-overlay">
+        <div class="modal">
+            <p>¿Estás seguro de eliminar el producto {{ productToDelete?.name }}?</p>
+            <div class="modal-actions">
+                <button class="cancel-button" (click)="closeDeleteModal()">Cancelar</button>
+                <button class="confirm-button" (click)="confirmDelete()">Confirmar</button>
+            </div>
+        </div>
+    </div>
 </div>

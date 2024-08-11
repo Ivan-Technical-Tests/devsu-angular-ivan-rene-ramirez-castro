@@ -21,6 +21,9 @@ export class ProductsComponent implements OnInit {
   activeDropdown: string | null = null;
   skeletonProducts = Array(5).fill({});
 
+  showDeleteModal = false;
+  productToDelete: Product | null = null;
+
   ngOnInit() {
     this.loadProducts();
   }
@@ -122,16 +125,32 @@ export class ProductsComponent implements OnInit {
     }
   }
 
+  openDeleteModal(product: Product) {
+    this.productToDelete = product;
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal() {
+    this.showDeleteModal = false;
+    this.productToDelete = null;
+  }
+
+  confirmDelete() {
+    if (this.productToDelete) {
+      this.productUsecase.deleteProduct(this.productToDelete.id).subscribe({
+        next: response => {
+          this.loadProducts();  // Recargar la lista de productos después de la eliminación
+          this.closeDeleteModal();
+        },
+        error: error => {
+          console.log(error);
+        }
+      });
+    }
+  }
+
   onEdit(productId: string) {
     alert(`Editar producto con ID: ${productId}`);
     // Aquí iría la lógica para editar el producto
-  }
-
-  onDelete(productId: string) {
-    const confirmed = confirm(`¿Estás seguro de que deseas eliminar el producto con ID: ${productId}?`);
-    if (confirmed) {
-      // Aquí iría la lógica para eliminar el producto
-      alert(`Producto con ID: ${productId} eliminado`);
-    }
   }
 }
