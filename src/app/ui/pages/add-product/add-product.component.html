@@ -1,0 +1,78 @@
+<app-header></app-header>
+
+<div class="product-form-container">
+    <h2>Formulario de Registro</h2>
+    <hr />
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="id">ID</label>
+                <input id="id" formControlName="id" type="text"
+                    [ngClass]="{'invalid': isFieldInvalid('id') || idExistsError}" placeholder="Ingrese el ID" />
+                <div *ngIf="isFieldInvalid('id')" class="error-message">
+                    <span *ngIf="productForm.get('id')?.hasError('minlength')">El ID debe tener al menos 3
+                        caracteres.</span>
+                    <span *ngIf="productForm.get('id')?.hasError('required')">Este campo es requerido!</span>
+                </div>
+                <div *ngIf="idExistsError" class="error-message">
+                    ID no válido! Ya existe un producto con este ID.
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="name">Nombre</label>
+                <input id="name" formControlName="name" type="text" [ngClass]="{'invalid': isFieldInvalid('name')}"
+                    placeholder="Ingrese el nombre" />
+                <div *ngIf="isFieldInvalid('name')" class="error-message">
+                    <span>Este campo es requerido!</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="description">Descripción</label>
+                <input id="description" formControlName="description" type="text"
+                    [ngClass]="{'invalid': isFieldInvalid('description')}" placeholder="Ingrese la descripción" />
+                <div *ngIf="isFieldInvalid('description')" class="error-message">
+                    <span>Este campo es requerido!</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="logo">Logo</label>
+                <input id="logo" formControlName="logo" type="text" [ngClass]="{'invalid': isFieldInvalid('logo')}"
+                    placeholder="Ingrese la URL del logo" />
+                <div *ngIf="isFieldInvalid('logo')" class="error-message">
+                    <span *ngIf="productForm.get('logo')?.hasError('pattern')">La URL no es válida.</span>
+                    <span *ngIf="productForm.get('logo')?.hasError('required')">Este campo es requerido!</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="releaseDate">Fecha Liberación</label>
+                <input id="releaseDate" formControlName="releaseDate" type="date"
+                    [ngClass]="{'invalid': isFieldInvalid('releaseDate')}" (change)="validateDates()" />
+                <div *ngIf="isFieldInvalid('releaseDate')" class="error-message">
+                    <span>Este campo es requerido!</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="reviewDate">Fecha Revisión</label>
+                <input id="reviewDate" formControlName="reviewDate" type="date"
+                    [ngClass]="{'invalid': isFieldInvalid('reviewDate') || productForm.get('reviewDate')?.hasError('invalidReviewDate')}"
+                    (change)="validateDates()" />
+                <div *ngIf="isFieldInvalid('reviewDate')" class="error-message">
+                    <span *ngIf="productForm.get('reviewDate')?.hasError('required')">Este campo es requerido!</span>
+                    <span *ngIf="productForm.get('reviewDate')?.hasError('invalidReviewDate')">La fecha de revisión no
+                        puede ser anterior a la de liberación.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-buttons">
+            <button type="button" class="reset-button" (click)="onReset()">Reiniciar</button>
+            <button type="submit" class="submit-button">Enviar</button>
+        </div>
+    </form>
+</div>
