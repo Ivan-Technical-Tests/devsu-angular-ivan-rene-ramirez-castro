@@ -36,7 +36,7 @@ export class FormProductComponent implements OnInit {
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(200)]],
       logo: ['', [Validators.required]],
       releaseDate: [today, [Validators.required, this.validateReleaseDate.bind(this)]],
-      reviewDate: [{ value: this.calculateReviewDate(today), disabled: true }, [Validators.required]]
+      reviewDate: [{ value: this.calculateReviewDate(new Date(today)), disabled: true }, [Validators.required]]
     });
   }
 
@@ -138,7 +138,7 @@ export class FormProductComponent implements OnInit {
 
     this.productForm.patchValue({
       releaseDate: today,
-      reviewDate: this.calculateReviewDate(today)
+      reviewDate: this.calculateReviewDate(new Date(today))
     });
 
     if (this.isEditMode && this.productId) {
@@ -164,14 +164,15 @@ export class FormProductComponent implements OnInit {
       this.productForm.get('releaseDate')?.setErrors({ invalidReleaseDate: true });
     } else {
       this.productForm.get('releaseDate')?.setErrors(null);
-      const reviewDate = this.calculateReviewDate(today.toISOString().split('T')[0]);
+      const reviewDate = this.calculateReviewDate(releaseDate);
       this.productForm.get('reviewDate')?.setValue(reviewDate);
+
     }
   }
 
-  calculateReviewDate(releaseDate: string): string {
-    const release = new Date(releaseDate);
-    const review = new Date(release.setFullYear(release.getFullYear() + 1));
+  calculateReviewDate(releaseDate: Date): string {
+    const review = new Date(releaseDate.setFullYear(releaseDate.getFullYear() + 1));
+    review.setDate(review.getDate() - 1);
     return review.toISOString().split('T')[0];
   }
 
@@ -200,11 +201,8 @@ export class FormProductComponent implements OnInit {
 
   showSuccessModal(): void {
     const message = this.isEditMode ? 'Producto actualizado exitosamente.' : 'Producto guardado exitosamente.';
-    if (confirm(`${message} ¿Deseas volver a la página de inicio?`)) {
-      this.router.navigate(['']);
-    } else {
-      this.router.navigate(['']);
-    }
+    alert(`${message}`)
+    this.router.navigate(['']);
   }
 
   showErrorModal(): void {
