@@ -53,20 +53,28 @@ export class FormProductComponent implements OnInit {
 
     // TODO: Quitar el delay y mostrar el skeleton de forma instantánea
     setTimeout(() => {
-      this.productUsecase.getProduct(id).subscribe((product: Product) => {
-        this.productForm.patchValue({
-          id: product.id,
-          name: product.name,
-          description: product.description,
-          logo: product.logo,
-          releaseDate: new Date(product.date_release).toISOString().split('T')[0],
-          reviewDate: new Date(product.date_revision).toISOString().split('T')[0]
-        });
 
-        this.productForm.get('id')?.disable();
-        this.loading = false;
+      this.productUsecase.getProduct(id).subscribe({
+        next: (product: Product) => {
+          this.productForm.patchValue({
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            logo: product.logo,
+            releaseDate: new Date(product.date_release).toISOString().split('T')[0],
+            reviewDate: new Date(product.date_revision).toISOString().split('T')[0]
+          });
+
+          this.productForm.get('id')?.disable();
+          this.loading = false;
+        },
+        error: () => {
+          this.loading = false;
+          this.showErrorModalGet();
+        }
       });
     }, 500);
+
   }
 
   onSubmit(): void {
@@ -191,4 +199,14 @@ export class FormProductComponent implements OnInit {
       // Si el usuario cierra el modal o da clic en aceptar, no se realiza ninguna acción
     }
   }
+
+  showErrorModalGet(): void {
+    const message = this.isEditMode ? 'El producto no existe.' : 'No se pudo cargar el producto.';
+    if (confirm(message)) {
+      // Si el usuario cierra el modal o da clic en aceptar, no se realiza ninguna acción
+    }
+    this.router.navigate(['']);
+  }
+
+
 }
