@@ -23,7 +23,11 @@
                 <input id="name" formControlName="name" type="text" [ngClass]="{'invalid': isFieldInvalid('name')}"
                     placeholder="Ingrese el nombre" />
                 <div *ngIf="isFieldInvalid('name')" class="error-message">
-                    <span>Este campo es requerido!</span>
+                    <span *ngIf="productForm.get('name')?.hasError('minlength')">El nombre debe tener al menos 6
+                        caracteres.</span>
+                    <span *ngIf="productForm.get('name')?.hasError('maxlength')">El nombre no puede exceder los 100
+                        caracteres.</span>
+                    <span *ngIf="productForm.get('name')?.hasError('required')">Este campo es requerido!</span>
                 </div>
             </div>
         </div>
@@ -34,7 +38,13 @@
                 <input id="description" formControlName="description" type="text"
                     [ngClass]="{'invalid': isFieldInvalid('description')}" placeholder="Ingrese la descripción" />
                 <div *ngIf="isFieldInvalid('description')" class="error-message">
-                    <span>Este campo es requerido!</span>
+                    <span *ngIf="productForm.get('description')?.hasError('minlength')">La descripción debe tener al
+                        menos 10
+                        caracteres.</span>
+                    <span *ngIf="productForm.get('description')?.hasError('maxlength')">La descripción no puede exceder
+                        los 200
+                        caracteres.</span>
+                    <span *ngIf="productForm.get('description')?.hasError('required')">Este campo es requerido!</span>
                 </div>
             </div>
             <div class="form-group">

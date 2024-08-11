@@ -23,8 +23,8 @@ export class AddProductComponent implements OnInit {
 
     this.productForm = this.fb.group({
       id: ['', [Validators.required, Validators.minLength(3)], this.validateIdNotTaken.bind(this)],
-      name: ['', Validators.required, Validators.minLength(6), Validators.maxLength(100)],
-      description: ['', Validators.required, Validators.minLength(10), Validators.maxLength(200)],
+      name: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(100)]],
+      description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(200)]],
       logo: ['', [Validators.required, Validators.pattern('(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})([/\\w .-]*)*/?')]],
       releaseDate: [today, [Validators.required, this.validateDates.bind(this)]], // Fecha de liberación inicializada a hoy
       reviewDate: [today, [Validators.required, this.validateDates.bind(this)]]  // Fecha de revisión inicializada a hoy
