@@ -1,113 +1,117 @@
 <app-header></app-header>
 
 <div class="products">
-    <div class="products__search">
-        <input type="text" placeholder="Search..." class="products__input" (input)="onSearchTermChange($event)">
-        <button class="add-button" (click)="onAdd()">Agregar</button>
-    </div>
+  <div class="products__search">
+    <input type="text" placeholder="Search..." class="products__input" (input)="onSearchTermChange($event)">
+    <button class="add-button" (click)="onAdd()">Agregar</button>
+  </div>
 
-    <div class="products__table-container">
-        <table class="products__table">
-            <thead>
-                <tr>
-                    <th>Logo</th>
-                    <th>Nombre del producto</th>
-                    <th>
-                        Descripción
-                        <img src="assets/icons/informacion.svg" alt="Info" class="info-icon"
-                            (click)="toggleTooltip('descriptionTooltip')">
-                        <div id="descriptionTooltip" class="tooltip-content">
-                            Descripción del producto.
-                        </div>
-                    </th>
-                    <th>
-                        Fecha de liberación
-                        <img src="assets/icons/informacion.svg" alt="Info" class="info-icon"
-                            (click)="toggleTooltip('releaseDateTooltip')">
-                        <div id="releaseDateTooltip" class="tooltip-content">
-                            Fecha en la que el producto fue liberado.
-                        </div>
-                    </th>
-                    <th>
-                        Fecha de reestructuración
-                        <img src="assets/icons/informacion.svg" alt="Info" class="info-icon"
-                            (click)="toggleTooltip('restructureDateTooltip')">
-                        <div id="restructureDateTooltip" class="tooltip-content">
-                            Fecha en la que el producto fue reestructurado.
-                        </div>
-                    </th>
-                    <th></th> <!-- Columna de acciones sin título -->
-                </tr>
-            </thead>
-            <tbody>
-                @if (loading) {
-                <tr *ngFor="let skeleton of skeletonProducts">
-                    <td class="skeleton__cell">
-                        <div class="skeleton__logo"></div>
-                    </td>
-                    <td class="skeleton__cell">
-                        <div class="skeleton__text"></div>
-                    </td>
-                    <td class="skeleton__cell">
-                        <div class="skeleton__text"></div>
-                    </td>
-                    <td class="skeleton__cell">
-                        <div class="skeleton__text"></div>
-                    </td>
-                    <td class="skeleton__cell">
-                        <div class="skeleton__text"></div>
-                    </td>
-                    <td class="skeleton__cell">
-                        <div class="skeleton__actions">
-                            <div class="skeleton__button"></div>
-                        </div>
-                    </td>
-                </tr>
-                } @else {
-                @for (product of paginatedProducts; track product.name) {
-                <tr>
-                    <td><img src="{{ product.logo }}" alt="Logo" class="product-logo"></td>
-                    <td>{{ product.name }}</td>
-                    <td>{{ product.description }}</td>
-                    <td>{{ product.date_release | date: 'dd/MM/yyyy' }}</td>
-                    <td>{{ product.date_revision | date: 'dd/MM/yyyy' }}</td>
-                    <td class="actions-column">
-                        <div class="dropdown">
-                            <button class="dropdown-button" (click)="toggleDropdown(product.id, $event)">⋮</button>
-                            <div id="dropdown-{{ product.id }}" class="dropdown-content">
-                                <p (click)="onEdit(product.id)">Editar</p>
-                                <p (click)="openDeleteModal(product)">Eliminar</p>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                }
-                }
-            </tbody>
-        </table>
-    </div>
-
-    <div class="products__results">
-        {{ filteredProducts.length }} Resultados
-        <select class="products__dropdown" (change)="onItemsPerPageChange($event)">
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-        </select>
-    </div>
-
-    @if (filteredProducts.length === 0 && !loading) {
-    <p>No hay productos disponibles.</p>
-    }
-
-    <!-- Modal de confirmación -->
-    <div *ngIf="showDeleteModal" class="modal-overlay">
-        <div class="modal">
-            <p>¿Estás seguro de eliminar el producto {{ productToDelete?.name }}?</p>
-            <div class="modal-actions">
-                <button class="cancel-button" (click)="closeDeleteModal()">Cancelar</button>
-                <button class="confirm-button" (click)="confirmDelete()">Confirmar</button>
+  <div class="products__table-container">
+    <table class="products__table">
+      <thead>
+        <tr>
+          <th>Logo</th>
+          <th>Nombre del producto</th>
+          <th>
+            Descripción
+            <img src="assets/icons/informacion.svg" alt="Info" class="info-icon"
+              (click)="toggleTooltip('descriptionTooltip')">
+            <div id="descriptionTooltip" class="tooltip-content">
+              Descripción del producto.
             </div>
+          </th>
+          <th>
+            Fecha de liberación
+            <img src="assets/icons/informacion.svg" alt="Info" class="info-icon"
+              (click)="toggleTooltip('releaseDateTooltip')">
+            <div id="releaseDateTooltip" class="tooltip-content">
+              Fecha en la que el producto fue liberado.
+            </div>
+          </th>
+          <th>
+            Fecha de reestructuración
+            <img src="assets/icons/informacion.svg" alt="Info" class="info-icon"
+              (click)="toggleTooltip('restructureDateTooltip')">
+            <div id="restructureDateTooltip" class="tooltip-content">
+              Fecha en la que el producto fue reestructurado.
+            </div>
+          </th>
+          <th></th> <!-- Columna de acciones sin título -->
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading) {
+          @for (skeleton of skeletonProducts; track skeleton) {
+            <tr>
+              <td class="skeleton__cell">
+                <div class="skeleton__logo"></div>
+              </td>
+              <td class="skeleton__cell">
+                <div class="skeleton__text"></div>
+              </td>
+              <td class="skeleton__cell">
+                <div class="skeleton__text"></div>
+              </td>
+              <td class="skeleton__cell">
+                <div class="skeleton__text"></div>
+              </td>
+              <td class="skeleton__cell">
+                <div class="skeleton__text"></div>
+              </td>
+              <td class="skeleton__cell">
+                <div class="skeleton__actions">
+                  <div class="skeleton__button"></div>
+                </div>
+              </td>
+            </tr>
+          }
+        } @else {
+          @for (product of paginatedProducts; track product.name) {
+            <tr>
+              <td><img src="{{ product.logo }}" alt="Logo" class="product-logo"></td>
+              <td>{{ product.name }}</td>
+              <td>{{ product.description }}</td>
+              <td>{{ product.date_release | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ product.date_revision | date: 'dd/MM/yyyy' }}</td>
+              <td class="actions-column">
+                <div class="dropdown">
+                  <button class="dropdown-button" (click)="toggleDropdown(product.id, $event)">⋮</button>
+                  <div id="dropdown-{{ product.id }}" class="dropdown-content">
+                    <p (click)="onEdit(product.id)">Editar</p>
+                    <p (click)="openDeleteModal(product)">Eliminar</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="products__results">
+    {{ filteredProducts.length }} Resultados
+    <select class="products__dropdown" (change)="onItemsPerPageChange($event)">
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="20">20</option>
+    </select>
+  </div>
+
+  @if (filteredProducts.length === 0 && !loading) {
+    <p>No hay productos disponibles.</p>
+  }
+
+  <!-- Modal de confirmación -->
+  @if (showDeleteModal) {
+    <div class="modal-overlay">
+      <div class="modal">
+        <p>¿Estás seguro de eliminar el producto {{ productToDelete?.name }}?</p>
+        <div class="modal-actions">
+          <button class="cancel-button" (click)="closeDeleteModal()">Cancelar</button>
+          <button class="confirm-button" (click)="confirmDelete()">Confirmar</button>
         </div>
+      </div>
     </div>
+  }
 </div>

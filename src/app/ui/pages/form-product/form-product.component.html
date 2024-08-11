@@ -1,114 +1,149 @@
 <app-header></app-header>
 
-<div *ngIf="loading; else formContent">
+@if (loading) {
+  <div>
     <div class="skeleton-form-container">
-        <div class="skeleton-header"></div>
-        <hr />
-        <div class="skeleton-form-row">
-            <div class="skeleton-form-group"></div>
-            <div class="skeleton-form-group"></div>
-        </div>
-        <div class="skeleton-form-row">
-            <div class="skeleton-form-group"></div>
-            <div class="skeleton-form-group"></div>
-        </div>
-        <div class="skeleton-form-row">
-            <div class="skeleton-form-group"></div>
-            <div class="skeleton-form-group"></div>
-        </div>
-        <div class="skeleton-form-row">
-            <div class="skeleton-buttons"></div>
-            <div class="skeleton-buttons"></div>
-        </div>
+      <div class="skeleton-header"></div>
+      <hr />
+      <div class="skeleton-form-row">
+        <div class="skeleton-form-group"></div>
+        <div class="skeleton-form-group"></div>
+      </div>
+      <div class="skeleton-form-row">
+        <div class="skeleton-form-group"></div>
+        <div class="skeleton-form-group"></div>
+      </div>
+      <div class="skeleton-form-row">
+        <div class="skeleton-form-group"></div>
+        <div class="skeleton-form-group"></div>
+      </div>
+      <div class="skeleton-form-row">
+        <div class="skeleton-buttons"></div>
+        <div class="skeleton-buttons"></div>
+      </div>
     </div>
-</div>
-
-<ng-template #formContent>
-    <div class="product-form-container">
-        <h2>{{ isEditMode ? 'Formulario de Edición' : 'Formulario de Registro' }}</h2>
-        <hr />
-        <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="id">ID</label>
-                    <input id="id" formControlName="id" type="text"
-                        [ngClass]="{'invalid': isFieldInvalid('id') || idExistsError}" placeholder="Ingrese el ID" />
-                    <div *ngIf="isFieldInvalid('id')" class="error-message">
-                        <span *ngIf="productForm.get('id')?.hasError('minlength')">El ID debe tener al menos 3
-                            caracteres.</span>
-                        <span *ngIf="productForm.get('id')?.hasError('required')">Este campo es requerido!</span>
-                    </div>
-                    <div *ngIf="idExistsError" class="error-message">
-                        ID no válido! Ya existe un producto con este ID.
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="name">Nombre</label>
-                    <input id="name" formControlName="name" type="text" [ngClass]="{'invalid': isFieldInvalid('name')}"
-                        placeholder="Ingrese el nombre" />
-                    <div *ngIf="isFieldInvalid('name')" class="error-message">
-                        <span *ngIf="productForm.get('name')?.hasError('minlength')">El nombre debe tener al menos 6
-                            caracteres.</span>
-                        <span *ngIf="productForm.get('name')?.hasError('maxlength')">El nombre no puede exceder los 100
-                            caracteres.</span>
-                        <span *ngIf="productForm.get('name')?.hasError('required')">Este campo es requerido!</span>
-                    </div>
-                </div>
+  </div>
+} @else {
+  <div class="product-form-container">
+    <h2>{{ isEditMode ? 'Formulario de Edición' : 'Formulario de Registro' }}</h2>
+    <hr />
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="id">ID</label>
+          <input id="id" formControlName="id" type="text"
+            [ngClass]="{'invalid': isFieldInvalid('id') || idExistsError}" placeholder="Ingrese el ID" />
+          @if (isFieldInvalid('id')) {
+            <div class="error-message">
+              @if (productForm.get('id')?.hasError('minlength')) {
+                <span>El ID debe tener al menos 3
+                caracteres.</span>
+              }
+              @if (productForm.get('id')?.hasError('required')) {
+                <span>Este campo es requerido!</span>
+              }
             </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="description">Descripción</label>
-                    <input id="description" formControlName="description" type="text"
-                        [ngClass]="{'invalid': isFieldInvalid('description')}" placeholder="Ingrese la descripción" />
-                    <div *ngIf="isFieldInvalid('description')" class="error-message">
-                        <span *ngIf="productForm.get('description')?.hasError('minlength')">La descripción debe tener al
-                            menos 10 caracteres.</span>
-                        <span *ngIf="productForm.get('description')?.hasError('maxlength')">La descripción no puede
-                            exceder los 200 caracteres.</span>
-                        <span *ngIf="productForm.get('description')?.hasError('required')">Este campo es
-                            requerido!</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="logo">Logo</label>
-                    <input id="logo" formControlName="logo" type="text" [ngClass]="{'invalid': isFieldInvalid('logo')}"
-                        placeholder="Ingrese la URL del logo" />
-                    <div *ngIf="isFieldInvalid('logo')" class="error-message">
-                        <span *ngIf="productForm.get('logo')?.hasError('required')">Este campo es requerido!</span>
-                    </div>
-                </div>
+          }
+          @if (idExistsError) {
+            <div class="error-message">
+              ID no válido! Ya existe un producto con este ID.
             </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="releaseDate">Fecha Liberación</label>
-                    <input id="releaseDate" formControlName="releaseDate" type="date"
-                        [ngClass]="{'invalid': isFieldInvalid('releaseDate') || productForm.get('releaseDate')?.hasError('invalidReleaseDate')}"
-                        (change)="validateReleaseDate()" />
-                    <div *ngIf="isFieldInvalid('releaseDate')" class="error-message">
-                        <span *ngIf="productForm.get('releaseDate')?.hasError('invalidReleaseDate')">La fecha de
-                            liberación no puede ser anterior a la fecha actual.</span>
-                        <span *ngIf="productForm.get('releaseDate')?.hasError('required')">Este campo es
-                            requerido!</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="reviewDate">Fecha Revisión</label>
-                    <input id="reviewDate" formControlName="reviewDate" type="date"
-                        [ngClass]="{'invalid': isFieldInvalid('reviewDate') || productForm.get('reviewDate')?.hasError('invalidReviewDate')}" />
-                    <div *ngIf="isFieldInvalid('reviewDate')" class="error-message">
-                        <span *ngIf="productForm.get('reviewDate')?.hasError('required')">Este campo es
-                            requerido!</span>
-                    </div>
-                </div>
+          }
+        </div>
+        <div class="form-group">
+          <label for="name">Nombre</label>
+          <input id="name" formControlName="name" type="text" [ngClass]="{'invalid': isFieldInvalid('name')}"
+            placeholder="Ingrese el nombre" />
+          @if (isFieldInvalid('name')) {
+            <div class="error-message">
+              @if (productForm.get('name')?.hasError('minlength')) {
+                <span>El nombre debe tener al menos 6
+                caracteres.</span>
+              }
+              @if (productForm.get('name')?.hasError('maxlength')) {
+                <span>El nombre no puede exceder los 100
+                caracteres.</span>
+              }
+              @if (productForm.get('name')?.hasError('required')) {
+                <span>Este campo es requerido!</span>
+              }
             </div>
-
-            <div class="form-buttons">
-                <button type="button" class="reset-button" (click)="onReset()">Reiniciar</button>
-                <button type="submit" class="submit-button">{{ isEditMode ? 'Actualizar' : 'Enviar' }}</button>
+          }
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="description">Descripción</label>
+          <input id="description" formControlName="description" type="text"
+            [ngClass]="{'invalid': isFieldInvalid('description')}" placeholder="Ingrese la descripción" />
+          @if (isFieldInvalid('description')) {
+            <div class="error-message">
+              @if (productForm.get('description')?.hasError('minlength')) {
+                <span>La descripción debe tener al
+                menos 10 caracteres.</span>
+              }
+              @if (productForm.get('description')?.hasError('maxlength')) {
+                <span>La descripción no puede
+                exceder los 200 caracteres.</span>
+              }
+              @if (productForm.get('description')?.hasError('required')) {
+                <span>Este campo es
+                requerido!</span>
+              }
             </div>
-        </form>
+          }
+        </div>
+        <div class="form-group">
+          <label for="logo">Logo</label>
+          <input id="logo" formControlName="logo" type="text" [ngClass]="{'invalid': isFieldInvalid('logo')}"
+            placeholder="Ingrese la URL del logo" />
+          @if (isFieldInvalid('logo')) {
+            <div class="error-message">
+              @if (productForm.get('logo')?.hasError('required')) {
+                <span>Este campo es requerido!</span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="releaseDate">Fecha Liberación</label>
+          <input id="releaseDate" formControlName="releaseDate" type="date"
+            [ngClass]="{'invalid': isFieldInvalid('releaseDate') || productForm.get('releaseDate')?.hasError('invalidReleaseDate')}"
+            (change)="validateReleaseDate()" />
+          @if (isFieldInvalid('releaseDate')) {
+            <div class="error-message">
+              @if (productForm.get('releaseDate')?.hasError('invalidReleaseDate')) {
+                <span>La fecha de
+                liberación no puede ser anterior a la fecha actual.</span>
+              }
+              @if (productForm.get('releaseDate')?.hasError('required')) {
+                <span>Este campo es
+                requerido!</span>
+              }
+            </div>
+          }
+        </div>
+        <div class="form-group">
+          <label for="reviewDate">Fecha Revisión</label>
+          <input id="reviewDate" formControlName="reviewDate" type="date"
+            [ngClass]="{'invalid': isFieldInvalid('reviewDate') || productForm.get('reviewDate')?.hasError('invalidReviewDate')}" />
+          @if (isFieldInvalid('reviewDate')) {
+            <div class="error-message">
+              @if (productForm.get('reviewDate')?.hasError('required')) {
+                <span>Este campo es
+                requerido!</span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+      <div class="form-buttons">
+        <button type="button" class="reset-button" (click)="onReset()">Reiniciar</button>
+        <button type="submit" class="submit-button">{{ isEditMode ? 'Actualizar' : 'Enviar' }}</button>
+      </div>
+    </form>
+  </div>
+}
 
-    </div>
-</ng-template>
