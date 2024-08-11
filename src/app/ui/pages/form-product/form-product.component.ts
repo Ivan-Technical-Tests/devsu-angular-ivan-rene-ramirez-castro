@@ -5,11 +5,11 @@ import { ProductUsecase } from '../../../domain/models/usecases/product-usecase'
 import { PostProductRequest, Product, PutProductRequest } from '../../../domain/models/product/product.model';
 
 @Component({
-  selector: 'app-add-product',
-  templateUrl: './add-product.component.html',
-  styleUrls: ['./add-product.component.css']
+  selector: 'app-form-product',
+  templateUrl: './form-product.component.html',
+  styleUrls: ['./form-product.component.css']
 })
-export class AddProductComponent implements OnInit {
+export class FormProductComponent implements OnInit {
 
   productForm: FormGroup;
   idExistsError: boolean = false;

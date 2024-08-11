@@ -8,19 +8,19 @@ import { ProductApiService } from '../../infraestructure/driven-adapter/product/
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ConfigService } from '../../infraestructure/config.service';
-import { AddProductComponent } from './add-product/add-product.component';
+import { FormProductComponent } from './form-product/form-product.component';
 
 
 const routes: Routes = [
   { path: '', component: ProductsComponent },
-  { path: 'add', component: AddProductComponent },
-  { path: 'edit', component: AddProductComponent },
+  { path: 'add', component: FormProductComponent },
+  { path: 'edit', component: FormProductComponent },
 ];
 
 @NgModule({
   declarations: [
     ProductsComponent,
-    AddProductComponent,
+    FormProductComponent,
   ],
   imports: [
     CommonModule,
