@@ -30,8 +30,8 @@ export class FormProductComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(100)]],
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(200)]],
       logo: ['', [Validators.required]],
-      releaseDate: [today, [Validators.required, this.validateDates.bind(this)]],
-      reviewDate: [today, [Validators.required, this.validateDates.bind(this)]]
+      releaseDate: [today, [Validators.required, this.validateReleaseDate.bind(this)]],
+      reviewDate: [{ value: this.calculateReviewDate(today), disabled: true }, [Validators.required]]
     });
   }
 
@@ -119,13 +119,13 @@ export class FormProductComponent implements OnInit {
   }
 
   onReset(): void {
+    const today = new Date().toISOString().split('T')[0];
     this.productForm.reset();
     this.idExistsError = false;
 
-    const today = new Date().toISOString().split('T')[0];
     this.productForm.patchValue({
       releaseDate: today,
-      reviewDate: today
+      reviewDate: this.calculateReviewDate(today)
     });
 
     if (this.isEditMode && this.productId) {
@@ -138,17 +138,28 @@ export class FormProductComponent implements OnInit {
     return fieldControl ? fieldControl.invalid && (fieldControl.touched || fieldControl.dirty) : false;
   }
 
-  validateDates() {
-    const releaseDate = this.productForm?.get('releaseDate')?.value;
-    const reviewDate = this.productForm?.get('reviewDate')?.value;
+  validateReleaseDate() {
 
-    if (!releaseDate || !reviewDate) return;
+    if (!this.productForm) return;
 
-    if (releaseDate && reviewDate && reviewDate < releaseDate) {
-      this.productForm.get('reviewDate')?.setErrors({ invalidReviewDate: true });
+    let releaseDate = new Date(this.productForm.get('releaseDate')?.value);
+    let today = new Date();
+
+    releaseDate.setHours(47, 59, 59, 0);
+
+    if (releaseDate < today) {
+      this.productForm.get('releaseDate')?.setErrors({ invalidReleaseDate: true });
     } else {
-      this.productForm.get('reviewDate')?.setErrors(null);
+      this.productForm.get('releaseDate')?.setErrors(null);
+      const reviewDate = this.calculateReviewDate(releaseDate.toISOString().split('T')[0]);
+      this.productForm.get('reviewDate')?.setValue(reviewDate);
     }
+  }
+
+  calculateReviewDate(releaseDate: string): string {
+    const release = new Date(releaseDate);
+    const review = new Date(release.setFullYear(release.getFullYear() + 1));
+    return review.toISOString().split('T')[0];
   }
 
   validateIdNotTaken(control: any) {

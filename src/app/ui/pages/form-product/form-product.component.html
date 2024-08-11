@@ -1,6 +1,5 @@
 <app-header></app-header>
 
-
 <div *ngIf="loading; else formContent">
     <div class="skeleton-form-container">
         <div class="skeleton-header"></div>
@@ -18,7 +17,6 @@
             <div class="skeleton-form-group"></div>
         </div>
         <div class="skeleton-form-row">
-
             <div class="skeleton-buttons"></div>
             <div class="skeleton-buttons"></div>
         </div>
@@ -26,16 +24,10 @@
 </div>
 
 <ng-template #formContent>
-
     <div class="product-form-container">
         <h2>{{ isEditMode ? 'Formulario de Edición' : 'Formulario de Registro' }}</h2>
         <hr />
-
-        <!-- Aquí va tu formulario -->
-
-
-
-        <form *ngIf="!loading" [formGroup]="productForm" (ngSubmit)="onSubmit()">
+        <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
             <div class="form-row">
                 <div class="form-group">
                     <label for="id">ID</label>
@@ -73,8 +65,7 @@
                         <span *ngIf="productForm.get('description')?.hasError('minlength')">La descripción debe tener al
                             menos 10 caracteres.</span>
                         <span *ngIf="productForm.get('description')?.hasError('maxlength')">La descripción no puede
-                            exceder
-                            los 200 caracteres.</span>
+                            exceder los 200 caracteres.</span>
                         <span *ngIf="productForm.get('description')?.hasError('required')">Este campo es
                             requerido!</span>
                     </div>
@@ -93,22 +84,22 @@
                 <div class="form-group">
                     <label for="releaseDate">Fecha Liberación</label>
                     <input id="releaseDate" formControlName="releaseDate" type="date"
-                        [ngClass]="{'invalid': isFieldInvalid('releaseDate')}" (change)="validateDates()" />
+                        [ngClass]="{'invalid': isFieldInvalid('releaseDate') || productForm.get('releaseDate')?.hasError('invalidReleaseDate')}"
+                        (change)="validateReleaseDate()" />
                     <div *ngIf="isFieldInvalid('releaseDate')" class="error-message">
-                        <span>Este campo es requerido!</span>
+                        <span *ngIf="productForm.get('releaseDate')?.hasError('invalidReleaseDate')">La fecha de
+                            liberación no puede ser anterior a la fecha actual.</span>
+                        <span *ngIf="productForm.get('releaseDate')?.hasError('required')">Este campo es
+                            requerido!</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="reviewDate">Fecha Revisión</label>
                     <input id="reviewDate" formControlName="reviewDate" type="date"
-                        [ngClass]="{'invalid': isFieldInvalid('reviewDate') || productForm.get('reviewDate')?.hasError('invalidReviewDate')}"
-                        (change)="validateDates()" />
+                        [ngClass]="{'invalid': isFieldInvalid('reviewDate') || productForm.get('reviewDate')?.hasError('invalidReviewDate')}" />
                     <div *ngIf="isFieldInvalid('reviewDate')" class="error-message">
                         <span *ngIf="productForm.get('reviewDate')?.hasError('required')">Este campo es
                             requerido!</span>
-                        <span *ngIf="productForm.get('reviewDate')?.hasError('invalidReviewDate')">La fecha de revisión
-                            no
-                            puede ser anterior a la de liberación.</span>
                     </div>
                 </div>
             </div>
