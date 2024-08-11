@@ -17,6 +17,7 @@ export class FormProductComponent implements OnInit {
   productId: string | null = null;
   loading: boolean = true;
 
+
   constructor(
     private fb: FormBuilder,
     private productUsecase: ProductUsecase,
@@ -26,7 +27,11 @@ export class FormProductComponent implements OnInit {
     const today = new Date().toISOString().split('T')[0];
 
     this.productForm = this.fb.group({
-      id: [{ value: '', disabled: this.isEditMode }, [Validators.required, Validators.minLength(3)]],
+      id: ['', {
+        validators: [Validators.required, Validators.minLength(3)],
+        asyncValidators: [this.validateIdNotTaken.bind(this)], // Validador asíncrono
+        updateOn: 'change' // Ejecuta la validación asíncrona en cada cambio de valor
+      }],
       name: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(100)]],
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(200)]],
       logo: ['', [Validators.required]],
@@ -172,15 +177,24 @@ export class FormProductComponent implements OnInit {
 
   validateIdNotTaken(control: any) {
     return new Promise((resolve) => {
-      this.productUsecase.validateProduct(control.value).subscribe((exists) => {
-        if (exists) {
-          this.idExistsError = true;
-          resolve({ idExists: true });
-        } else {
-          this.idExistsError = false;
-          resolve(null);
-        }
-      });
+      if (!control.value || this.isEditMode) {
+        resolve(null);
+      } else {
+        this.productUsecase.validateProduct(control.value).subscribe({
+          next: (exists) => {
+            if (exists) {
+              this.idExistsError = true;
+              resolve({ idExists: true });
+            } else {
+              this.idExistsError = false;
+              resolve(null);
+            }
+          },
+          error: () => {
+            resolve({ idExists: true });
+          }
+        });
+      }
     });
   }
 
